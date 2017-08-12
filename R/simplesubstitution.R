@@ -1,10 +1,24 @@
 library(stringr)
 
-pp <- "(?<=\\{)(.*?)(?=\\})"
+pp <- "(?<=\\{\\$)(.*?)(?=\\})"
 test_string <- 'SELECT {column} FROM {table};'
 
-list_parameters <- function(s) {
-  unlist(str_extract_all(s, pp))
+#' Show parameters in a string
+#'
+#' @param s a string with some parameters.
+#'
+#' @details
+#' By default, params are enclosed like so: `{$param}`.
+#' This works fine for SQL. If you _need_ to change it, you can modify the pattern argument.
+#'
+#' @return A character vector of parameters.
+#' @export
+#'
+#' @examples
+#' list_parameters("SELECT {column} from {table}")
+list_parameters <- function(s, pattern = pp) {
+  params <- unlist(stringr::str_extract_all(s, pattern))
+  params[!duplicated(params)]
 }
 
 #' Substitution
@@ -37,8 +51,8 @@ substitution <- function(s, params, pattern = pp) {
   }
 
   for (param in names(params)) {
-    p <- paste0("\\{", param, "\\}")
-    s <- gsub(p, params[[param]], s)
+    p <- paste0("\\{\\$", param, "\\}")
+    s <- gsub(p, params[[param]], s, perl = T)
   }
   s
 }
