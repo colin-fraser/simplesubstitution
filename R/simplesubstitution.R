@@ -1,7 +1,6 @@
 library(stringr)
 
 pp <- "(?<=\\{\\$)(.*?)(?=\\})"
-test_string <- 'SELECT {column} FROM {table};'
 
 #' Show parameters in a string
 #'
